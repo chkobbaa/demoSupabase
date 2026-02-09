@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HabitFlow</title>
+  <link rel="stylesheet" href="style.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+  <!-- AUTH SCREEN -->
+  <div id="auth-screen" class="screen active">
+    <div class="auth-container">
+      <div class="logo">
+        <span class="logo-icon">🌊</span>
+        <h1>HabitFlow</h1>
+        <p class="tagline">Build better habits, one day at a time</p>
+      </div>
+      <div class="auth-tabs">
+        <button class="tab-btn active" data-tab="login">Sign In</button>
+        <button class="tab-btn" data-tab="signup">Sign Up</button>
+      </div>
+      <form id="auth-form">
+        <input type="email" id="auth-email" placeholder="Email" required />
+        <input type="password" id="auth-password" placeholder="Password" required />
+        <button type="submit" id="auth-submit" class="btn-primary">Sign In</button>
+      </form>
+      <div id="auth-error" class="error-msg"></div>
+    </div>
+  </div>
+
+  <!-- MAIN APP -->
+  <div id="app-screen" class="screen">
+    <header>
+      <div class="header-left">
+        <span class="logo-icon-sm">🌊</span>
+        <h2>HabitFlow</h2>
+      </div>
+      <div class="header-right">
+        <span id="user-email" class="user-email"></span>
+        <button id="logout-btn" class="btn-ghost">Logout</button>
+      </div>
+    </header>
+
+    <main>
+      <!-- Stats Cards -->
+      <section class="stats-row">
+        <div class="stat-card">
+          <div class="stat-number" id="stat-total">0</div>
+          <div class="stat-label">Habits</div>
+        </div>
+        <div class="stat-card accent">
+          <div class="stat-number" id="stat-today">0</div>
+          <div class="stat-label">Done Today</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-number" id="stat-streak">0</div>
+          <div class="stat-label">Best Streak</div>
+        </div>
+      </section>
+
+      <!-- Add Habit -->
+      <section class="add-habit-section">
+        <h3>New Habit</h3>
+        <form id="add-habit-form" class="add-habit-form">
+          <input type="text" id="habit-name" placeholder="e.g. Read 20 pages" required maxlength="50" />
+          <div class="habit-options">
+            <div class="emoji-picker">
+              <label>Icon</label>
+              <div class="emoji-grid" id="emoji-grid"></div>
+            </div>
+            <div class="color-picker">
+              <label>Color</label>
+              <div class="color-grid" id="color-grid"></div>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">Add Habit</button>
+        </form>
+      </section>
+
+      <!-- Today's Habits -->
+      <section class="habits-section">
+        <h3>Today — <span id="today-date"></span></h3>
+        <div id="habits-list" class="habits-list"></div>
+        <div id="empty-state" class="empty-state">
+          <span class="empty-icon">📋</span>
+          <p>No habits yet. Add your first one above!</p>
+        </div>
+      </section>
+
+      <!-- Calendar Heatmap -->
+      <section class="calendar-section">
+        <h3>Activity — last 60 days</h3>
+        <div id="calendar-heatmap" class="calendar-heatmap"></div>
+        <div class="heatmap-legend">
+          <span>Less</span>
+          <div class="legend-box l0"></div>
+          <div class="legend-box l1"></div>
+          <div class="legend-box l2"></div>
+          <div class="legend-box l3"></div>
+          <div class="legend-box l4"></div>
+          <span>More</span>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Supabase JS from CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

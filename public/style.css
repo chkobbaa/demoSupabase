@@ -152,6 +152,12 @@ body {
   margin-top: 12px;
   min-height: 20px;
 }
+.success-msg {
+  color: var(--green);
+  font-size: 13px;
+  margin-top: 8px;
+  min-height: 20px;
+}
 
 /* ========== HEADER ========== */
 header {

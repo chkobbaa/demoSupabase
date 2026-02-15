@@ -37,25 +37,46 @@ document.querySelectorAll(".tab-btn").forEach((btn) => {
     isLogin = btn.dataset.tab === "login";
     authSubmit.textContent = isLogin ? "Sign In" : "Sign Up";
     authError.textContent = "";
+    authSuccess.textContent = "";
   });
 });
+
+const authSuccess = document.getElementById("auth-success");
 
 authForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   authError.textContent = "";
+  authSuccess.textContent = "";
+  authSubmit.disabled = true;
+  authSubmit.textContent = "Loading...";
+
   const email = authEmail.value.trim();
   const password = authPassword.value;
 
-  let result;
-  if (isLogin) {
-    result = await supabase.auth.signInWithPassword({ email, password });
-  } else {
-    result = await supabase.auth.signUp({ email, password });
+  try {
+    let result;
+    if (isLogin) {
+      result = await supabase.auth.signInWithPassword({ email, password });
+    } else {
+      result = await supabase.auth.signUp({ email, password });
+    }
+
+    if (result.error) {
+      authError.textContent = result.error.message;
+    } else if (!isLogin) {
+      // Signup succeeded — check if email confirmation is needed
+      if (result.data?.user?.identities?.length === 0) {
+        authError.textContent = "An account with this email already exists.";
+      } else if (!result.data?.session) {
+        authSuccess.textContent = "Check your email to confirm your account!";
+      }
+    }
+  } catch (err) {
+    authError.textContent = "Connection error. Check your Supabase config.";
   }
 
-  if (result.error) {
-    authError.textContent = result.error.message;
-  }
+  authSubmit.disabled = false;
+  authSubmit.textContent = isLogin ? "Sign In" : "Sign Up";
 });
 
 logoutBtn.addEventListener("click", async () => {

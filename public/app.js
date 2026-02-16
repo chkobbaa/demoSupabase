@@ -1,5 +1,23 @@
-// Initialize Supabase client
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+(function () {
+// Initialize Supabase client safely
+let supabase = null;
+let supabaseInitError = "";
+
+try {
+  if (!window.supabase?.createClient) {
+    throw new Error("Supabase SDK failed to load. Check your internet connection.");
+  }
+  if (!SUPABASE_URL || SUPABASE_URL.includes("YOUR_SUPABASE_URL")) {
+    throw new Error("Supabase URL is not configured in config.js.");
+  }
+  if (!SUPABASE_ANON_KEY || SUPABASE_ANON_KEY.includes("YOUR_SUPABASE_ANON_KEY")) {
+    throw new Error("Supabase anon key is not configured in config.js.");
+  }
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+} catch (error) {
+  supabaseInitError = error.message;
+  console.error("Supabase init error:", error);
+}
 
 // Emoji and color options
 const EMOJIS = ["✅", "📖", "🏃", "💧", "🧘", "💪", "🎯", "💻", "🎨", "🌙"];
@@ -16,7 +34,8 @@ const appScreen = document.getElementById("app-screen");
 const authForm = document.getElementById("auth-form");
 const authEmail = document.getElementById("auth-email");
 const authPassword = document.getElementById("auth-password");
-const authSubmit = document.getElementById("auth-submit");
+const signInBtn = document.getElementById("signin-btn");
+const signUpBtn = document.getElementById("signup-btn");
 const authError = document.getElementById("auth-error");
 const habitForm = document.getElementById("add-habit-form");
 const habitName = document.getElementById("habit-name");
@@ -26,36 +45,55 @@ const logoutBtn = document.getElementById("logout-btn");
 const userEmailSpan = document.getElementById("user-email");
 const todayDateSpan = document.getElementById("today-date");
 
-let isLogin = true;
-
 // ===================== AUTH =====================
-
-document.querySelectorAll(".tab-btn").forEach((btn) => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll(".tab-btn").forEach((b) => b.classList.remove("active"));
-    btn.classList.add("active");
-    isLogin = btn.dataset.tab === "login";
-    authSubmit.textContent = isLogin ? "Sign In" : "Sign Up";
-    authError.textContent = "";
-    authSuccess.textContent = "";
-  });
-});
 
 const authSuccess = document.getElementById("auth-success");
 
+signInBtn.addEventListener("click", async () => {
+  await runAuth("login");
+});
+
+signUpBtn.addEventListener("click", async () => {
+  await runAuth("signup");
+});
+
 authForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  await runAuth("login");
+});
+
+async function runAuth(mode) {
+  if (!supabase) {
+    authError.textContent = supabaseInitError || "Supabase is not initialized.";
+    return;
+  }
+
+  if (!authForm.reportValidity()) {
+    return;
+  }
+
   authError.textContent = "";
   authSuccess.textContent = "";
-  authSubmit.disabled = true;
-  authSubmit.textContent = "Loading...";
+  signInBtn.disabled = true;
+  signUpBtn.disabled = true;
+  signInBtn.textContent = mode === "login" ? "Loading..." : "Sign In";
+  signUpBtn.textContent = mode === "signup" ? "Loading..." : "Sign Up";
 
   const email = authEmail.value.trim();
   const password = authPassword.value;
 
+  if (!email || !password) {
+    authError.textContent = "Email and password are required.";
+    signInBtn.disabled = false;
+    signUpBtn.disabled = false;
+    signInBtn.textContent = "Sign In";
+    signUpBtn.textContent = "Sign Up";
+    return;
+  }
+
   try {
     let result;
-    if (isLogin) {
+    if (mode === "login") {
       result = await supabase.auth.signInWithPassword({ email, password });
     } else {
       result = await supabase.auth.signUp({ email, password });
@@ -63,7 +101,7 @@ authForm.addEventListener("submit", async (e) => {
 
     if (result.error) {
       authError.textContent = result.error.message;
-    } else if (!isLogin) {
+    } else if (mode === "signup") {
       // Signup succeeded — check if email confirmation is needed
       if (result.data?.user?.identities?.length === 0) {
         authError.textContent = "An account with this email already exists.";
@@ -75,24 +113,32 @@ authForm.addEventListener("submit", async (e) => {
     authError.textContent = "Connection error. Check your Supabase config.";
   }
 
-  authSubmit.disabled = false;
-  authSubmit.textContent = isLogin ? "Sign In" : "Sign Up";
-});
+  signInBtn.disabled = false;
+  signUpBtn.disabled = false;
+  signInBtn.textContent = "Sign In";
+  signUpBtn.textContent = "Sign Up";
+}
 
 logoutBtn.addEventListener("click", async () => {
+  if (!supabase) return;
   await supabase.auth.signOut();
 });
 
 // Listen to auth state changes
-supabase.auth.onAuthStateChange((event, session) => {
-  if (session?.user) {
-    currentUser = session.user;
-    showApp();
-  } else {
-    currentUser = null;
-    showAuth();
-  }
-});
+if (supabase) {
+  supabase.auth.onAuthStateChange((event, session) => {
+    if (session?.user) {
+      currentUser = session.user;
+      showApp();
+    } else {
+      currentUser = null;
+      showAuth();
+    }
+  });
+} else {
+  showAuth();
+  authError.textContent = supabaseInitError || "Supabase initialization failed.";
+}
 
 function showAuth() {
   authScreen.classList.add("active");
@@ -344,3 +390,5 @@ function escapeHTML(str) {
   div.textContent = str;
   return div.innerHTML;
 }
+
+})();

@@ -58,6 +58,28 @@ npm run dev
 
 Open http://localhost:3000
 
+## Supabase Local (inside DevContainer)
+
+After reopening in the DevContainer:
+
+1. Initialize Supabase local config (first time only)
+    - `npm run supabase:init`
+2. Start local Supabase stack
+    - `npm run supabase:start`
+3. Check local URLs and anon key
+    - `npm run supabase:status`
+4. Stop stack when done
+    - `npm run supabase:stop`
+
+Use local credentials for the frontend by updating `public/config.js` with values from `supabase status`:
+
+```js
+const SUPABASE_URL = "http://127.0.0.1:54321";
+const SUPABASE_ANON_KEY = "<anon key from supabase status>";
+```
+
+Studio is available at `http://127.0.0.1:54323`.
+
 ## Project Structure
 
 ```

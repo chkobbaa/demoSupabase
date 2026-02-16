@@ -1,14 +1,18 @@
 {
   "name": "HabitFlow - Supabase Demo",
   "image": "mcr.microsoft.com/devcontainers/javascript-node:22",
-  "forwardPorts": [3000],
-  "postCreateCommand": "npm install",
+  "features": {
+    "ghcr.io/devcontainers/features/docker-outside-of-docker:1": {}
+  },
+  "forwardPorts": [3000, 54321, 54322, 54323, 54324, 54327],
+  "postCreateCommand": "npm install && ARCH=$(uname -m) && if [ \"$ARCH\" = \"x86_64\" ]; then SUPA_ARCH=amd64; elif [ \"$ARCH\" = \"aarch64\" ] || [ \"$ARCH\" = \"arm64\" ]; then SUPA_ARCH=arm64; else echo Unsupported architecture: $ARCH && exit 1; fi && curl -fsSL https://github.com/supabase/cli/releases/latest/download/supabase_linux_${SUPA_ARCH}.tar.gz | tar -xz -C /tmp && sudo mv /tmp/supabase /usr/local/bin/supabase && supabase --version",
   "customizations": {
     "vscode": {
       "extensions": [
         "dbaeumer.vscode-eslint",
         "esbenp.prettier-vscode",
-        "ritwickdey.LiveServer"
+        "ritwickdey.LiveServer",
+        "supabase.supabase"
       ],
       "settings": {
         "editor.formatOnSave": true,

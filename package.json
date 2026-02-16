@@ -6,11 +6,11 @@
   "scripts": {
     "start": "node server.js",
     "dev": "node --watch server.js",
-    "supabase:init": "supabase init",
-    "supabase:start": "supabase start",
-    "supabase:stop": "supabase stop",
-    "supabase:status": "supabase status",
-    "supabase:db:reset": "supabase db reset"
+    "supabase:init": "npx --yes supabase@latest init",
+    "supabase:start": "npx --yes supabase@latest start",
+    "supabase:stop": "npx --yes supabase@latest stop",
+    "supabase:status": "npx --yes supabase@latest status",
+    "supabase:db:reset": "npx --yes supabase@latest db reset"
   },
   "dependencies": {
     "express": "^4.21.0",

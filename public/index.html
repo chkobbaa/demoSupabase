@@ -9,6 +9,9 @@
 </head>
 <body>
 
+  <canvas id="confetti-canvas"></canvas>
+  <div id="toast-container"></div>
+
   <!-- AUTH SCREEN -->
   <div id="auth-screen" class="screen active">
     <div class="auth-container">
@@ -39,74 +42,145 @@
       </div>
       <div class="header-right">
         <span id="user-email" class="user-email"></span>
+        <button id="theme-toggle-btn" class="theme-toggle-btn" title="Toggle theme">☀️</button>
         <button id="logout-btn" class="btn-ghost">Logout</button>
       </div>
     </header>
 
-    <main>
-      <!-- Stats Cards -->
-      <section class="stats-row">
-        <div class="stat-card">
-          <div class="stat-number" id="stat-total">0</div>
-          <div class="stat-label">Habits</div>
-        </div>
-        <div class="stat-card accent">
-          <div class="stat-number" id="stat-today">0</div>
-          <div class="stat-label">Done Today</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-number" id="stat-streak">0</div>
-          <div class="stat-label">Best Streak</div>
-        </div>
-      </section>
+    <!-- BOTTOM NAV -->
+    <nav class="bottom-nav">
+      <button id="nav-home" class="nav-btn nav-active">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Home</span>
+      </button>
+      <button id="nav-profile" class="nav-btn">
+        <span class="nav-icon">👤</span>
+        <span class="nav-label">Profile</span>
+      </button>
+    </nav>
 
-      <!-- Add Habit -->
-      <section class="add-habit-section">
-        <h3>New Habit</h3>
-        <form id="add-habit-form" class="add-habit-form">
-          <input type="text" id="habit-name" placeholder="e.g. Read 20 pages" required maxlength="50" />
-          <div class="habit-options">
-            <div class="emoji-picker">
-              <label>Icon</label>
-              <div class="emoji-grid" id="emoji-grid"></div>
-            </div>
-            <div class="color-picker">
-              <label>Color</label>
-              <div class="color-grid" id="color-grid"></div>
+    <main>
+
+      <!-- ========== HOME VIEW ========== -->
+      <div id="home-view" class="view view-active" style="display:block">
+
+        <!-- Quote -->
+        <section class="quote-section">
+          <div class="quote-card">
+            <span class="quote-icon">💡</span>
+            <div class="quote-body">
+              <p class="quote-text" id="quote-text"></p>
+              <span class="quote-author" id="quote-author"></span>
             </div>
           </div>
-          <button type="submit" class="btn-primary">Add Habit</button>
-        </form>
-      </section>
+        </section>
 
-      <!-- Today's Habits -->
-      <section class="habits-section">
-        <h3>Today — <span id="today-date"></span></h3>
-        <div id="habits-list" class="habits-list"></div>
-        <div id="empty-state" class="empty-state">
-          <span class="empty-icon">📋</span>
-          <p>No habits yet. Add your first one above!</p>
-        </div>
-      </section>
+        <!-- Stats — 4 cards -->
+        <section class="stats-row">
+          <div class="stat-card">
+            <div class="stat-number" id="stat-total">0</div>
+            <div class="stat-label">Habits</div>
+          </div>
+          <div class="stat-card accent">
+            <div class="stat-number" id="stat-today">0</div>
+            <div class="stat-label">Done Today</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="stat-streak">0</div>
+            <div class="stat-label">Best Streak</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-number" id="stat-active-days">0</div>
+            <div class="stat-label">Active Days</div>
+          </div>
+        </section>
 
-      <!-- Calendar Heatmap -->
-      <section class="calendar-section">
-        <h3>Activity — last 60 days</h3>
-        <div id="calendar-heatmap" class="calendar-heatmap"></div>
-        <div class="heatmap-legend">
-          <span>Less</span>
-          <div class="legend-box l0"></div>
-          <div class="legend-box l1"></div>
-          <div class="legend-box l2"></div>
-          <div class="legend-box l3"></div>
-          <div class="legend-box l4"></div>
-          <span>More</span>
-        </div>
-      </section>
+        <!-- Progress Bar -->
+        <section class="progress-section">
+          <div class="progress-wrapper">
+            <div class="progress-header">
+              <div class="progress-title">Daily Progress</div>
+              <div class="progress-label" id="progress-label">0 / 0 completed today</div>
+            </div>
+            <div class="progress-track">
+              <div class="progress-fill" id="progress-bar-fill"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Add Habit -->
+        <section class="add-habit-section">
+          <h3>New Habit</h3>
+          <form id="add-habit-form" class="add-habit-form">
+            <input type="text" id="habit-name" placeholder="e.g. Read 20 pages" required maxlength="50" />
+            <div class="habit-options">
+              <div class="emoji-picker">
+                <label>Icon</label>
+                <div class="emoji-grid" id="emoji-grid"></div>
+              </div>
+              <div class="color-picker">
+                <label>Color</label>
+                <div class="color-grid" id="color-grid"></div>
+              </div>
+              <div class="category-picker">
+                <label>Category</label>
+                <select id="habit-category" class="cat-select"></select>
+              </div>
+            </div>
+            <button type="submit" class="btn-primary">Add Habit</button>
+          </form>
+        </section>
+
+        <!-- Today's Habits -->
+        <section class="habits-section">
+          <h3>Today — <span id="today-date"></span></h3>
+
+          <!-- Search bar -->
+          <div class="search-bar">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="search-input" placeholder="Search habits..." />
+          </div>
+
+          <!-- Category filter tabs -->
+          <div id="category-filter-bar" class="category-filter-bar"></div>
+
+          <div id="habits-list" class="habits-list"></div>
+          <div id="empty-state" class="empty-state">
+            <span class="empty-icon">📋</span>
+            <p>No habits found. Try a different filter or add a new one!</p>
+          </div>
+        </section>
+
+        <!-- Calendar Heatmap -->
+        <section class="calendar-section">
+          <h3>Activity — last 60 days</h3>
+          <div id="calendar-heatmap" class="calendar-heatmap"></div>
+          <div class="heatmap-legend">
+            <span>Less</span>
+            <div class="legend-box l0"></div>
+            <div class="legend-box l1"></div>
+            <div class="legend-box l2"></div>
+            <div class="legend-box l3"></div>
+            <div class="legend-box l4"></div>
+            <span>More</span>
+          </div>
+        </section>
+
+      </div>
+      <!-- END HOME VIEW -->
+
+      <!-- ========== PROFILE VIEW ========== -->
+      <div id="profile-view" class="view" style="display:none">
+        <section class="profile-section">
+          <h3>My Profile</h3>
+          <div id="profile-content"></div>
+        </section>
+      </div>
+      <!-- END PROFILE VIEW -->
+
     </main>
   </div>
 
-  <!-- Supabase JS from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
   <script src="config.js"></script>
   <script src="app.js"></script>
